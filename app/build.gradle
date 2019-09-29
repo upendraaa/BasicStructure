@@ -31,6 +31,9 @@ dependencies {
     implementation 'com.trello.rxlifecycle3:rxlifecycle:3.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
+    implementation 'android.arch.persistence.room:runtime:1.1.1'
+    annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
+
 
 // If you want to bind to Android-specific lifecycles
     implementation 'com.trello.rxlifecycle3:rxlifecycle-android:3.0.0'

@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">BasicStructure</string>
+
+    <string-array name="options">
+        <item>Album</item>
+        <item>Artist</item>
+    </string-array>
+
+    <string-array name="grid_size">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
 </resources>
