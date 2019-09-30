@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -23,9 +24,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder>  {
 
     private RecycledViewPool viewPool = new RecycledViewPool();
     private ArrayList<SubItem> itemArrayList;
+    private ArrayList<SubItem> filteredList = new ArrayList<>();
+    private ArrayList<SubItem> subItems;
+
     private int columnCount = 1;
     private String filter = "Album";
     SubItemAdapter subItemAdapter;
+
+    LinkedHashMap<String,ArrayList<SubItem>> filteredMap;
 
     public ItemAdapter(ArrayList<SubItem> list)
     {
@@ -35,6 +41,31 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder>  {
     public void setFilter(String filter)
     {
         this.filter = filter;
+
+        //TODO
+        filteredMap = new LinkedHashMap<String, ArrayList<SubItem>>();
+
+        if("Album".equalsIgnoreCase(filter))
+        {
+            for(SubItem subItem:itemArrayList) {
+
+                if(filteredMap.containsKey(subItem.album))
+                {
+                    ArrayList<SubItem> subItems = filteredMap.get(subItem.album);
+                    subItems.add(subItem);
+
+                    filteredMap.put(subItem.album,subItems);
+                }else{
+                    ArrayList<SubItem> subItems = filteredMap.get(subItem.album);
+                    subItems.add(subItem);
+
+                    filteredMap.put(subItem.album,subItems);
+                }
+            }
+        }else
+        {
+
+        }
     }
 
     public void setSize(int size)
@@ -62,13 +93,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder>  {
     public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
 
         SubItem item = itemArrayList.get(position);
-        holder.tvTitle.setText(item.album);
 
         if(!TextUtils.isEmpty(filter) && "Album".equalsIgnoreCase(filter))
         {
-            subItemAdapter = new SubItemAdapter(getFilteredItemsByName(item.album));
+            subItems = getFilteredItemsByArtist(item.album);
+            holder.tvTitle.setText(item.album);
         }else{
-            subItemAdapter = new SubItemAdapter(getFilteredItemsByName(item.artist));
+            subItems = getFilteredItemsByArtist(item.artist);
+            holder.tvTitle.setText(item.artist);
         }
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(
@@ -77,6 +109,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder>  {
         holder.rvSubItem.setLayoutManager(gridLayoutManager);
         holder.rvSubItem.setAdapter(subItemAdapter);
         holder.rvSubItem.setRecycledViewPool(viewPool);
+        subItemAdapter = new SubItemAdapter(subItems);
+
 
 
     }
@@ -126,5 +160,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder>  {
             this.rvSubItem = (itemView).findViewById(R.id.rvGrid);
         }
     }
+
+
+
 }
 

@@ -101,6 +101,10 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
 
             @Override
             public void onFailure(Call<Item> call, Throwable t) {
+                List<SubItem> subItems = getItems();
+                Item item = new Item();
+                item.list = (ArrayList<SubItem>) subItems;
+                setAdapter(item);
                 Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -116,11 +120,22 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
         }
     }
 
-    private List<DatabaseEntity> getItems()
+    private List<SubItem> getItems()
     {
         DataRepository dataRepository = new DataRepository(getApplicationContext());
 
-        return (List<DatabaseEntity>) dataRepository.fetchAllData();
+        List<DatabaseEntity> databaseEntities= (List<DatabaseEntity>) dataRepository.fetchAllData();
+        ArrayList<SubItem> subItems = new ArrayList<>();
+
+        for(DatabaseEntity databaseEntity:databaseEntities){
+            SubItem subItem = new SubItem();
+            subItem.album = databaseEntity.album;
+            subItem.artist = databaseEntity.artist;
+            subItem.name = databaseEntity.name;
+            subItems.add(subItem);
+        }
+        return subItems;
+
     }
 
     @Override
