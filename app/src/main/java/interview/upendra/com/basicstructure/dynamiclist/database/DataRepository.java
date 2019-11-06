@@ -1,21 +1,24 @@
 package interview.upendra.com.basicstructure.dynamiclist.database;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
+import interview.upendra.com.basicstructure.BasicApplication;
 import interview.upendra.com.basicstructure.dynamiclist.SubItem;
 
 public class DataRepository {
 
     private String DB_NAME = "db_task";
+    private MutableLiveData<ArrayList<SubItem>> subItemMutableLiveData;
 
     private AppDatabase appDatabase;
-    public DataRepository(Context context) {
-        appDatabase = Room.databaseBuilder(context, AppDatabase.class, DB_NAME).build();
+    public DataRepository() {
+        appDatabase = Room.databaseBuilder(BasicApplication.getContext(), AppDatabase.class, DB_NAME).build();
     }
 
 
@@ -47,6 +50,25 @@ public class DataRepository {
 
     public LiveData<List<DatabaseEntity>> fetchAllDataByArtist(String artist) {
         return appDatabase.daoAccess().fetchDataByArtist(artist);
+    }
+
+
+    public List<SubItem> getItems()
+    {
+        LiveData<List<DatabaseEntity>> databaseEntities=  fetchAllData();
+        ArrayList<SubItem> subItems = new ArrayList<>();
+        if(databaseEntities==null || databaseEntities.getValue()==null)
+            return subItems;
+
+        for(DatabaseEntity databaseEntity:databaseEntities.getValue()){
+            SubItem subItem = new SubItem();
+            subItem.album = databaseEntity.album;
+            subItem.artist = databaseEntity.artist;
+            subItem.name = databaseEntity.name;
+            subItems.add(subItem);
+        }
+        return subItems;
+
     }
 
 }

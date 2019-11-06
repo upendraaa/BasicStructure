@@ -8,7 +8,7 @@ public class RetrofitInstance {
 
     private static Retrofit retrofit;
 
-    public static Retrofit getRetrofitInstance() {
+    private static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
             retrofit = new retrofit2.Retrofit.Builder()
                     .baseUrl(Constant.BASE_URL)
@@ -16,5 +16,9 @@ public class RetrofitInstance {
                     .build();
         }
         return retrofit;
+    }
+
+    public static <S> S cteateService(Class<S> serviceClass) {
+        return getRetrofitInstance().create(serviceClass);
     }
 }

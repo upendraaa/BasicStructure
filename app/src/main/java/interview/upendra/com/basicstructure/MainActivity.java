@@ -1,30 +1,25 @@
 package interview.upendra.com.basicstructure;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import interview.upendra.com.basicstructure.dynamiclist.ArtistViewModel;
 import interview.upendra.com.basicstructure.dynamiclist.Item;
 import interview.upendra.com.basicstructure.dynamiclist.SelectListener;
 import interview.upendra.com.basicstructure.dynamiclist.SubItem;
+import interview.upendra.com.basicstructure.dynamiclist.ViewModelFactory;
 import interview.upendra.com.basicstructure.dynamiclist.adapter.ItemAdapter;
-import interview.upendra.com.basicstructure.dynamiclist.database.DataRepository;
-import interview.upendra.com.basicstructure.dynamiclist.database.DatabaseEntity;
-import interview.upendra.com.basicstructure.dynamiclist.network.GetDataService;
-import interview.upendra.com.basicstructure.dynamiclist.network.RetrofitInstance;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class MainActivity extends AppCompatActivity implements SelectListener {
 
@@ -35,6 +30,13 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
 
     ArrayList<SubItem> subItems;
 
+    ArtistViewModel artistViewModel;
+    Item item;
+
+    private ViewModelFactory mViewModelFactory;
+
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,21 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
         recyclerView = findViewById(R.id.rvAlbum);
         spinnerByName = findViewById(R.id.spFilter);
         spinnerBySize = findViewById(R.id.spGridSize);
+
+        mViewModelFactory = new ViewModelFactory();
+        itemAdapter = new ItemAdapter(new ArrayList<SubItem>());
+
+        artistViewModel = new ViewModelProvider(this, mViewModelFactory).get(ArtistViewModel.class);
+        artistViewModel.init();
+
+        artistViewModel.getArtistRepository().observe(  this, new Observer<Item>() {
+            @Override
+            public void onChanged(Item response) {
+                 item = response;
+                itemAdapter.notifyDataSetChanged();
+            }
+        });
+
 
         spinnerByName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -68,15 +85,20 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
 
             }
         });
+
+        setAdapter(item);
     }
 
     @Override
     protected void onStart() {
-        getData();
         super.onStart();
     }
 
     private void setAdapter(Item item){
+        if(item ==null)
+        {
+            return;
+        }
         this.subItems = item.list;
          itemAdapter = new ItemAdapter(item.list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
@@ -87,56 +109,6 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
     }
 
 
-    public void getData(){
-
-        GetDataService service = RetrofitInstance.getRetrofitInstance().create(GetDataService.class);
-        Call<Item> call = service.getAllData();
-        call.enqueue(new Callback<Item>() {
-            @Override
-            public void onResponse(Call<Item> i, Response<Item> response) {
-                Log.d("Response",response.message());
-                addToDatabase(response.body());
-                setAdapter(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<Item> call, Throwable t) {
-                List<SubItem> subItems = getItems();
-                Item item = new Item();
-                item.list = (ArrayList<SubItem>) subItems;
-                setAdapter(item);
-                Toast.makeText(MainActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void addToDatabase(Item item)
-    {
-        DataRepository dataRepository = new DataRepository(getApplicationContext());
-
-        for(SubItem subItem: item.list)
-        {
-           dataRepository.insertItem(subItem);
-        }
-    }
-
-    private List<SubItem> getItems()
-    {
-        DataRepository dataRepository = new DataRepository(getApplicationContext());
-
-        List<DatabaseEntity> databaseEntities= (List<DatabaseEntity>) dataRepository.fetchAllData();
-        ArrayList<SubItem> subItems = new ArrayList<>();
-
-        for(DatabaseEntity databaseEntity:databaseEntities){
-            SubItem subItem = new SubItem();
-            subItem.album = databaseEntity.album;
-            subItem.artist = databaseEntity.artist;
-            subItem.name = databaseEntity.name;
-            subItems.add(subItem);
-        }
-        return subItems;
-
-    }
 
     @Override
     public void onSelectTitle(String title) {

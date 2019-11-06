@@ -30,7 +30,6 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'com.trello.rxlifecycle3:rxlifecycle:3.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-
     implementation 'android.arch.persistence.room:runtime:1.1.1'
     annotationProcessor 'android.arch.persistence.room:compiler:1.1.1'
 
@@ -46,6 +45,10 @@ dependencies {
 
 // If you want to use Android Lifecycle for providers
     implementation 'com.trello.rxlifecycle3:rxlifecycle-android-lifecycle:3.0.0'
+
+    //Glide image caching library
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
