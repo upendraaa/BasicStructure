@@ -47,7 +47,7 @@ public class ArtistViewModel extends ViewModel {
     }
 
     public LiveData<Item> getArtistRepository() {
-        return itemMutableLiveData;
+        return networkRepository.getItem();
     }
 
 }

@@ -23,7 +23,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder>  {
 
 
     private RecycledViewPool viewPool = new RecycledViewPool();
-    private ArrayList<SubItem> itemArrayList;
+    private ArrayList<SubItem> itemArrayList= new ArrayList<>();
     private ArrayList<SubItem> filteredList = new ArrayList<>();
     private ArrayList<SubItem> subItems;
 
@@ -33,51 +33,54 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder>  {
 
     LinkedHashMap<String,ArrayList<SubItem>> filteredMap;
 
-    public ItemAdapter(ArrayList<SubItem> list)
+    public ItemAdapter()
     {
-        this.itemArrayList = list;
+    }
+
+    public void setData(ArrayList<SubItem> list){
+        if(itemArrayList == null)
+        {
+            itemArrayList = new ArrayList<>();
+        }
+        itemArrayList.clear();
+        itemArrayList.addAll(list);
+        this.notifyDataSetChanged();
     }
 
     public void setFilter(String filter)
     {
         this.filter = filter;
+        notifyDataSetChanged();
 
-        //TODO
-        filteredMap = new LinkedHashMap<String, ArrayList<SubItem>>();
-
-        if("Album".equalsIgnoreCase(filter))
-        {
-            for(SubItem subItem:itemArrayList) {
-
-                if(filteredMap.containsKey(subItem.album))
-                {
-                    ArrayList<SubItem> subItems = filteredMap.get(subItem.album);
-                    subItems.add(subItem);
-
-                    filteredMap.put(subItem.album,subItems);
-                }else{
-                    ArrayList<SubItem> subItems = filteredMap.get(subItem.album);
-                    subItems.add(subItem);
-
-                    filteredMap.put(subItem.album,subItems);
-                }
-            }
-        }else
-        {
-
-        }
+//        //TODO
+//        filteredMap = new LinkedHashMap<String, ArrayList<SubItem>>();
+//
+//        if("Album".equalsIgnoreCase(filter))
+//        {
+//            for(SubItem subItem:itemArrayList) {
+//
+//                if(filteredMap.containsKey(subItem.album))
+//                {
+//                    ArrayList<SubItem> subItems = filteredMap.get(subItem.album);
+//                    subItems.add(subItem);
+//
+//                    filteredMap.put(subItem.album,subItems);
+//                }else{
+//                    ArrayList<SubItem> subItems = filteredMap.get(subItem.album);
+//                    subItems.add(subItem);
+//
+//                    filteredMap.put(subItem.album,subItems);
+//                }
+//            }
+//        }else
+//        {
+//
+//        }
     }
 
     public void setSize(int size)
     {
         this.columnCount = size;
-    }
-
-
-    public void updateData(ArrayList<SubItem> list)
-    {
-        this.itemArrayList = list;
-        notifyDataSetChanged();
     }
 
 

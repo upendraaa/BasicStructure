@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
     ItemAdapter itemAdapter;
     AppCompatSpinner spinnerByName, spinnerBySize;
 
-    ArrayList<SubItem> subItems;
+    ArrayList<SubItem> subItems = new ArrayList<>();
 
     ArtistViewModel artistViewModel;
     Item item;
@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
         spinnerBySize = findViewById(R.id.spGridSize);
 
         mViewModelFactory = new ViewModelFactory();
-        itemAdapter = new ItemAdapter(new ArrayList<SubItem>());
+        itemAdapter = new ItemAdapter();
+        itemAdapter.setData(new ArrayList<SubItem>());
 
         artistViewModel = new ViewModelProvider(this, mViewModelFactory).get(ArtistViewModel.class);
         artistViewModel.init();
@@ -56,6 +57,10 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
             @Override
             public void onChanged(Item response) {
                  item = response;
+                 if(item!=null)
+                     subItems = item.list;
+
+                itemAdapter.setData(subItems);
                 itemAdapter.notifyDataSetChanged();
             }
         });
@@ -86,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
             }
         });
 
-        setAdapter(item);
+        setAdapter();
     }
 
     @Override
@@ -94,13 +99,8 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
         super.onStart();
     }
 
-    private void setAdapter(Item item){
-        if(item ==null)
-        {
-            return;
-        }
-        this.subItems = item.list;
-         itemAdapter = new ItemAdapter(item.list);
+    private void setAdapter(){
+         itemAdapter.setData(subItems);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(itemAdapter);
@@ -116,7 +116,8 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
             return;
 
         itemAdapter.setFilter(title);
-        itemAdapter.updateData(subItems);
+        itemAdapter.setData(subItems);
+        recyclerView.setAdapter(itemAdapter);
     }
 
     @Override
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements SelectListener {
             return;
 
         itemAdapter.setSize(pos);
-        itemAdapter.updateData(subItems);
+        itemAdapter.setData(subItems);
+        recyclerView.setAdapter(itemAdapter);
     }
 }
